@@ -3,7 +3,7 @@
 
   Programmiert von Frank Wolter
 
-  Version 3 vom 17.10.2022
+  Version 4 vom 17.10.2022
 
   prompt-sync muss installiert sein
   npm install prompt-sync
@@ -28,8 +28,10 @@ let solved = false; // Flag ob Code geknackt wurde
 
 let mastermindCode = [];
 mastermindCode = createCodeArray(CODELENGTH, 1, 8); // Mastermind-Code erzeugen
+// mastermindCode = [8, 3, 7, 8]; // Test
+// mastermindCode = [8, 3, 7, 8]; // Test
 // Ausgabe des zu suchenden Codes nur für die Entwicklung
-// console.log("Der Code ist: " + mastermindCode);
+// console.log("Der Code ist: " + mastermindCode.join(""));
 
 gameExplanation(); // Ausgabe der Spielerklärung
 
@@ -138,7 +140,59 @@ function isArrayEqual(a1, a2) {
     return isEqual;
 }
 
+/**********************************************************************
+ * Vergleicht das Array userArray mit dem Array mastermindArray.
+ * Wenn beide Arrays an derselben Position die gleiche
+ * Zahl haben, wird im Ausgabestring das Zeichen B notiert.
+ * Wenn die betrachtete Zahl des userArray im mastermindArray
+ * an einer anderen Stelle vorkommt, wird im Ausgabestring 
+ * ein C notiert.
+ * Der Ausgabestring enthält das Ergebnis aller B und C Ergebnisse  
+ * @param {*} userArray 
+ * @param {*} mastermindArray 
+ * @returns Ausgabestring
+ **********************************************************************/
+function compareInput(userArray, mastermindArray) {
+  let hit = ""; // wird mit B für jede richtige Zahl auf gleicher Position belegt
+  let pos = ""; // wird mit C für jede richtige Zahl auf anderer Position belegt
+  let result = ""; // das Gesamtergebnis aus hit und pos
+
+  // Arrays kopieren, wir arbeiten mit der Kopie
+  // da die Arrays temporär verändert werden um erratene Zahlen auszuklammern
+  let userArrayCopy = [...userArray];
+  let masterMindArrayCopy = [...mastermindArray];
+
+  // Überprüfen gleiche Zahl auf gleicher Position
+  for (i = 0; i < userArrayCopy.length; i++) {
+    if (userArrayCopy[i] == masterMindArrayCopy[i]) {
+      // erratene Zahlen werden ausgeklammert, damit sie nicht mehrfach ausgewertet werden
+      // dazu werden die Zahlen in den beiden Arrays mit 0 und 9 belegt, da diese Zahlen
+      // im Code nicht vorkommen und für jedes Array unterschiedlich sind
+      masterMindArrayCopy[i] = 0; // diese Zahl macht nicht mehr mit
+      userArrayCopy[i] = 9; // diese Zahl macht nicht mehr mit
+      hit += "B";
+    }
+  }
+
+  // Überprüfen gleiche Zahl auf anderer Position
+  for (x = 0; x < userArrayCopy.length; x++) {
+    for (y = 0; y < masterMindArrayCopy.length; y++) {
+      if (userArrayCopy[x] == masterMindArrayCopy[y]) {
+        masterMindArrayCopy[y] = 0; // diese Zahl macht nicht mehr mit
+        pos += "C";
+        break; // für diese Zahl sind wir fertig und verlassen die Schleife damit es keine mehrfache Auswertung gibt
+      }
+    }
+  }
+
+  result = hit + pos;
+
+  return result;
+}
+
 /********************************************************************
+ * Diese Variante funktioniert nicht - es wird noch daran gearbeitet
+ * 
  * Vergleicht das Array userArray mit dem Array mastermindArray.
  * Wenn beide Arrays an derselben Position die gleiche
  * Zahl haben, wird im Ausgabestring das Zeichen B notiert.
@@ -150,14 +204,14 @@ function isArrayEqual(a1, a2) {
  * @param {*} mastermindArray 
  * @returns Ausgabestring
  ********************************************************************/
-function compareInput(userArray, mastermindArray) {
+function compareInputPrototype(userArray, mastermindArray) {
   let hit = ""; // wird mit B für jede richtige Zahl auf gleicher Position belegt
   let pos = ""; // wird mit C für jede richtige Zahl auf anderer Position belegt
   let result = ""; // das Gesamtergebnis aus hit und pos
 
   for (x = 0; x < userArray.length; x++) {
     for (y = 0; y < mastermindArray.length; y++) {
-      if (userArray[y] == mastermindArray[x]) {
+      if (userArray[x] == mastermindArray[y]) {
         if (x == y) {
           hit += "B";
         } else {
