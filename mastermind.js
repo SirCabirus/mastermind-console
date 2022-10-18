@@ -48,7 +48,7 @@ mastermindCode = createCodeArray(CODELENGTH, 1, 8, unique); // Mastermind-Code e
 // mastermindCode = [8, 3, 7, 8]; // Test
 // mastermindCode = [8, 3, 7, 8]; // Test
 // Ausgabe des zu suchenden Codes nur für die Entwicklung
-console.log("Der Code ist: " + mastermindCode.join(""));
+// console.log("Der Code ist: " + mastermindCode.join(""));
 
 gameExplanation(); // Ausgabe der Spielerklärung
 
@@ -136,9 +136,7 @@ function createCodeArray(len, min, max, unique) {
       if (unique) {
         if (!codeArray.includes(number)) {
           success = true;
-        } else {
-          console.log("Zahl " + number + " bereits enthalten");
-        }
+        } 
       } else {
         success = true;
       }
