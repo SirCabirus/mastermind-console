@@ -1,14 +1,18 @@
-/******************************************
+/**************************************************************************************
   Mastermind für Console
 
   Programmiert von Frank Wolter
 
-  Version 4 vom 17.10.2022
+  Version 5 vom 18.10.2022
 
   prompt-sync muss installiert sein
   npm install prompt-sync
 
-  Aufruf: node mastermind.js
+  Aufruf: node mastermind.js [parm]
+
+  parm ist optional und ein beliebiger Parameter
+  ist er nicht vorhanden sind alle Zahlen im Code nur einmal vorhanden
+  ist der Parameter vorhanden können Zahlen im Code mehrfach vorhanden sein
 
   Eine Codeziffer an der richtigen Stelle 
   gibt ein B zurück
@@ -16,7 +20,19 @@
   Eine Codeziffer an einer anderen Stelle
   gibt ein C zurück
 
-*******************************************/
+***************************************************************************************/
+
+const parms = process.argv;
+let unique; // Flag ob der Code jede Zahl nur einmal enthalten darf oder auch mehrmals
+
+// parm[2] ist der erste beim Aufruf übergebene Parameter
+if (parms[2] == undefined) {
+  // wenn es keinen Aufrufparameter gibt
+  unique = true;
+} else {
+  // wenn es irgendeinen Aufrufparameter gibt
+  unique = false;
+}
 
 const MAXTRIES = 12; // Anzahl der maximal möglichen Versuche den Code zu knacken
 const CODELENGTH = 4; // Länge des zu ermittelnden Codes
@@ -26,16 +42,17 @@ let checkString; // die Auswertung der Eingabe
 let guess; // speichert die Eingabe eines Rateversuchs in einem Array
 let solved = false; // Flag ob Code geknackt wurde
 
+
 let mastermindCode = [];
-mastermindCode = createCodeArray(CODELENGTH, 1, 8); // Mastermind-Code erzeugen
+mastermindCode = createCodeArray(CODELENGTH, 1, 8, unique); // Mastermind-Code erzeugen
 // mastermindCode = [8, 3, 7, 8]; // Test
 // mastermindCode = [8, 3, 7, 8]; // Test
 // Ausgabe des zu suchenden Codes nur für die Entwicklung
-// console.log("Der Code ist: " + mastermindCode.join(""));
+console.log("Der Code ist: " + mastermindCode.join(""));
 
 gameExplanation(); // Ausgabe der Spielerklärung
 
-// gameloop
+// gameloop start
 do {
   guess = getUserInput(CODELENGTH); // Rateversuch von Console einlesen
   tries--;
@@ -46,6 +63,7 @@ do {
     console.log("-> " + checkString + "  du hast noch " + tries + " Versuche."); // sonst Auswertung anzeigen
   }
 } while (!solved && tries > 0);
+// gameloop end
 
 if (solved) {
   console.log("Du hast den Code mit " + (MAXTRIES - tries) + " Versuchen geknackt!");
@@ -108,10 +126,24 @@ function checkNumber(str, len) {
  * @param {*} max die größte Ziffer
  * @returns das erzeugte Array
  ****************************************************************/
-function createCodeArray(len, min, max) {
+function createCodeArray(len, min, max, unique) {
   let codeArray = [];
+  let number;
   for (i = 0; i < len; i++) {
-    codeArray[i] = rand(min, max);
+    let success = false;
+    do {
+      number = rand(min, max);
+      if (unique) {
+        if (!codeArray.includes(number)) {
+          success = true;
+        } else {
+          console.log("Zahl " + number + " bereits enthalten");
+        }
+      } else {
+        success = true;
+      }
+    } while (!success);
+    codeArray[i] = number;
   }
   return codeArray;
 }
@@ -235,7 +267,11 @@ function gameExplanation() {
   console.log("                            Mastermind");
   console.log("");
   console.log(" Knacke einen " + CODELENGTH + "-stelligen Code, der aus den Ziffern 1 bis 8 besteht.");
-  console.log(" Jede Ziffer kann mehrmals im Code enthalten sein. Gib dazu eine Zahl aus " + CODELENGTH + " Ziffern ein.");
+  if (unique) {
+    console.log(" Jede Ziffer kann nur einmal im Code enthalten sein. Gib dazu eine Zahl aus " + CODELENGTH + " Ziffern ein.");
+  } else {
+    console.log(" Jede Ziffer kann mehrmals im Code enthalten sein. Gib dazu eine Zahl aus " + CODELENGTH + " Ziffern ein.");
+  }
   console.log(" Der Computer vergleicht die Eingabe mit dem Code und gibt eine Rückmeldung.");
   console.log(" Für jede Ziffer, die an der richtigen Stelle steht, wird ein B ausgegeben.");
   console.log(" Für jede Ziffer, die im Code an einer anderen Stelle steht wird ein C ausgegeben.");
